@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,14 +46,7 @@ export default function Home() {
 
   const supabase = createClient();
 
-  // Supabaseからデータを読み込み
-  useEffect(() => {
-    if (!initialized) {
-      loadData();
-    }
-  }, [initialized]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -132,14 +125,21 @@ export default function Home() {
       console.log(`${commentsWithCorrectFields.length}件のコメントを読み込みました`);
       setComments(commentsWithCorrectFields);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('データの読み込みに失敗しました:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'エラーが発生しました');
     } finally {
       setLoading(false);
       setInitialized(true);
     }
-  };
+  }, [supabase]);
+
+  // Supabaseからデータを読み込み
+  useEffect(() => {
+    if (!initialized) {
+      loadData();
+    }
+  }, [initialized, loadData]);
 
   // currentUserをローカルストレージに保存
   useEffect(() => {
@@ -177,9 +177,9 @@ export default function Home() {
         
         setTasks([...tasks, newTaskData]);
         setNewTask('');
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('タスクの追加に失敗しました:', error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'エラーが発生しました');
       }
     }
   };
@@ -219,9 +219,9 @@ export default function Home() {
         setNewUserName('');
         setNewUserEmail('');
         setShowRegistration(false);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('ユーザー登録に失敗しました:', error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'エラーが発生しました');
       }
     }
   };
@@ -257,9 +257,9 @@ export default function Home() {
 
         setComments([...comments, newComment]);
         setNewComments(prev => ({ ...prev, [taskId]: '' }));
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('コメントの追加に失敗しました:', error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'エラーが発生しました');
       }
     }
   };
@@ -284,9 +284,9 @@ export default function Home() {
       setTasks(tasks.map(task => 
         task.id === id ? { ...task, completed: !task.completed } : task
       ));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('タスクの更新に失敗しました:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'エラーが発生しました');
     }
   };
 
@@ -303,9 +303,9 @@ export default function Home() {
       setTasks(tasks.filter(task => task.id !== id));
       // 関連するコメントも削除（Supabaseの外部キー制約で自動削除される）
       setComments(comments.filter(comment => comment.taskId !== id));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('タスクの削除に失敗しました:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'エラーが発生しました');
     }
   };
 
@@ -335,9 +335,9 @@ export default function Home() {
             : task
         ));
         setDraggedTask(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('タスクの更新に失敗しました:', error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'エラーが発生しました');
         setDraggedTask(null);
       }
     }

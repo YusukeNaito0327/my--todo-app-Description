@@ -125,21 +125,21 @@ export default function Home() {
       console.log(`${commentsWithCorrectFields.length}件のコメントを読み込みました`);
       setComments(commentsWithCorrectFields);
 
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('データの読み込みに失敗しました:', error);
       setError(error instanceof Error ? error.message : 'エラーが発生しました');
     } finally {
       setLoading(false);
       setInitialized(true);
     }
-  }, [supabase]);
+  }, []);
 
   // Supabaseからデータを読み込み
   useEffect(() => {
     if (!initialized) {
       loadData();
     }
-  }, [initialized, loadData]);
+  }, [initialized]);
 
   // currentUserをローカルストレージに保存
   useEffect(() => {
@@ -177,7 +177,7 @@ export default function Home() {
         
         setTasks([...tasks, newTaskData]);
         setNewTask('');
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('タスクの追加に失敗しました:', error);
         setError(error instanceof Error ? error.message : 'エラーが発生しました');
       }
@@ -219,7 +219,7 @@ export default function Home() {
         setNewUserName('');
         setNewUserEmail('');
         setShowRegistration(false);
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('ユーザー登録に失敗しました:', error);
         setError(error instanceof Error ? error.message : 'エラーが発生しました');
       }
@@ -257,7 +257,7 @@ export default function Home() {
 
         setComments([...comments, newComment]);
         setNewComments(prev => ({ ...prev, [taskId]: '' }));
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('コメントの追加に失敗しました:', error);
         setError(error instanceof Error ? error.message : 'エラーが発生しました');
       }
@@ -284,7 +284,7 @@ export default function Home() {
       setTasks(tasks.map(task => 
         task.id === id ? { ...task, completed: !task.completed } : task
       ));
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('タスクの更新に失敗しました:', error);
       setError(error instanceof Error ? error.message : 'エラーが発生しました');
     }
@@ -303,7 +303,7 @@ export default function Home() {
       setTasks(tasks.filter(task => task.id !== id));
       // 関連するコメントも削除（Supabaseの外部キー制約で自動削除される）
       setComments(comments.filter(comment => comment.taskId !== id));
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('タスクの削除に失敗しました:', error);
       setError(error instanceof Error ? error.message : 'エラーが発生しました');
     }
@@ -335,7 +335,7 @@ export default function Home() {
             : task
         ));
         setDraggedTask(null);
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('タスクの更新に失敗しました:', error);
         setError(error instanceof Error ? error.message : 'エラーが発生しました');
         setDraggedTask(null);
